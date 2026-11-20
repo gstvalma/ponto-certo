@@ -1,0 +1,18 @@
+GLOBAL SOLUTION 2026.2 - APPLICATION DEVELOPMENT
+Projeto: Ponto Certo
+Turma: 2º ano de Ciência da Computação - Prof. Rodrigo Moraes
+
+Repositório: https://github.com/USUARIO/ponto-certo
+App no Vercel: https://SEU-PROJETO.vercel.app
+
+INTEGRANTES E RESPONSABILIDADES
+(preencham com o nome, o RM e o que cada um realmente fez)
+
+1. NOME COMPLETO - RM00000
+   -
+
+2. NOME COMPLETO - RM00000
+   -
+
+3. NOME COMPLETO - RM00000
+   -

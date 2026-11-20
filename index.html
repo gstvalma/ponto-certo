@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Veja os próximos ônibus do seu ponto em São Paulo e saiba a hora certa de sair de casa.">
+  <meta name="theme-color" content="#0b3d6b">
+  <title>Ponto Certo — ônibus de SP na hora certa</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚏</text></svg>">
+
+  <!-- Leaflet: biblioteca de mapas (sugerida no enunciado) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
+
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <header class="topo">
+    <a class="marca" href="#">
+      <span class="marca__icone" aria-hidden="true">🚏</span>
+      <span>Ponto Certo</span>
+    </a>
+    <button id="botao-acessivel" class="botao-acessivel" type="button" aria-pressed="false">
+      <span aria-hidden="true">Aa</span>
+      <span class="botao-acessivel__texto">Modo acessível</span>
+    </button>
+  </header>
+
+  <main id="conteudo">
+    <!-- ===================== TELA INICIAL ===================== -->
+    <section id="tela-inicio" class="tela" aria-labelledby="titulo-inicio">
+      <h1 id="titulo-inicio" class="titulo-pagina">Qual é o seu ponto?</h1>
+
+      <div class="abas" role="tablist" aria-label="Tipo de busca">
+        <button class="aba" role="tab" type="button" data-tipo="paradas" aria-selected="true">Pontos</button>
+        <button class="aba" role="tab" type="button" data-tipo="linhas" aria-selected="false">Linhas</button>
+      </div>
+
+      <label for="campo-busca" class="rotulo-busca">Busque pelo nome da rua, do ponto ou da linha</label>
+      <form id="form-busca" class="busca" role="search">
+        <input id="campo-busca" type="search" required minlength="2" autocomplete="off"
+               placeholder="Ex.: Paulista">
+        <button class="botao botao--primario" type="submit">Buscar</button>
+      </form>
+
+      <button id="botao-perto" class="botao-link" type="button">
+        📍 <span>Ordenar pontos pelo mais perto de mim</span>
+      </button>
+
+      <div id="resultados" class="resultados" aria-live="polite"></div>
+
+      <section class="bloco" aria-labelledby="titulo-favoritos">
+        <h2 id="titulo-favoritos" class="titulo-secao">Meus pontos</h2>
+        <ul id="lista-favoritos" class="lista-cartoes"></ul>
+      </section>
+    </section>
+
+    <!-- ===================== PAINEL DE UM PONTO ===================== -->
+    <section id="tela-ponto" class="tela" aria-labelledby="ponto-nome" hidden>
+      <a class="voltar" href="#">← Voltar</a>
+
+      <div class="cabecalho-ponto">
+        <div>
+          <h1 id="ponto-nome" class="titulo-pagina">Ponto</h1>
+          <p id="ponto-endereco" class="texto-suave"></p>
+        </div>
+        <button id="botao-favorito" class="botao-favorito" type="button" aria-pressed="false">
+          <span aria-hidden="true">☆</span>
+          <span class="so-leitor">Salvar nos meus pontos</span>
+        </button>
+      </div>
+
+      <div class="controles">
+        <label class="campo-caminhada">
+          <span>🚶 Minutos a pé até o ponto</span>
+          <input id="campo-caminhada" type="number" min="0" max="60" step="1" inputmode="numeric" value="0">
+        </label>
+        <label class="interruptor">
+          <input id="filtro-acessivel" type="checkbox">
+          <span>♿ Só veículos acessíveis</span>
+        </label>
+      </div>
+
+      <div id="resumo-saida" class="resumo-saida" aria-live="polite"></div>
+
+      <p class="status-atualizacao">
+        <span id="ponto-status">Carregando…</span>
+        <button id="botao-atualizar-ponto" class="botao-link" type="button">Atualizar agora</button>
+      </p>
+
+      <ul id="lista-previsoes" class="lista-previsoes"></ul>
+
+      <p class="dica">🔔 Toque em “Me avise” numa linha e o app avisa quando for hora de sair.
+        Deixe esta página aberta para receber o aviso.</p>
+    </section>
+
+    <!-- ===================== MAPA DE UMA LINHA ===================== -->
+    <section id="tela-linha" class="tela" aria-labelledby="linha-titulo" hidden>
+      <a class="voltar" href="#">← Voltar</a>
+
+      <div class="cabecalho-linha">
+        <span id="linha-letreiro" class="letreiro">----</span>
+        <div>
+          <h1 id="linha-titulo" class="titulo-pagina titulo-pagina--menor">Linha</h1>
+          <p id="linha-sentido" class="texto-suave"></p>
+        </div>
+      </div>
+
+      <div class="controles controles--linha">
+        <p id="linha-status" class="texto-suave">Carregando…</p>
+        <button id="botao-inverter" class="botao botao--secundario" type="button" hidden>⇄ Outro sentido</button>
+      </div>
+
+      <div id="mapa" class="mapa" role="region" aria-label="Mapa com os ônibus da linha"></div>
+
+      <ul class="legenda" aria-label="Legenda do mapa">
+        <li><span class="legenda__onibus" aria-hidden="true">🚌</span> Ônibus</li>
+        <li><span class="legenda__onibus legenda__onibus--acessivel" aria-hidden="true">🚌</span> Ônibus acessível</li>
+        <li><span class="legenda__ponto" aria-hidden="true"></span> Ponto da linha (toque para ver previsões)</li>
+      </ul>
+    </section>
+  </main>
+
+  <div id="aviso" class="aviso" role="status" hidden></div>
+
+  <footer class="rodape">
+    Dados em tempo real fornecidos pela <strong>SPTrans</strong> por meio da
+    <a href="https://www.sptrans.com.br/desenvolvedores/" target="_blank" rel="noopener">API Olho Vivo</a>.
+    Mapas © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>.
+  </footer>
+</body>
+</html>

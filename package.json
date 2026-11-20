@@ -1,0 +1,13 @@
+{
+  "name": "ponto-certo",
+  "version": "1.0.0",
+  "description": "App web que mostra os próximos ônibus de um ponto em São Paulo e avisa a hora de sair de casa, usando a API Olho Vivo da SPTrans.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "node dev/server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
